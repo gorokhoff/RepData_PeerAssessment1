@@ -74,7 +74,7 @@ assignment so you do not have to download the data separately.
 
 
 
-### Loading and preprocessing the data
+### 1 Loading and preprocessing the data
 
 Show any code that is needed to
 
@@ -83,7 +83,7 @@ Show any code that is needed to
 2. Process/transform the data (if necessary) into a format suitable for your analysis
 
 
-### What is mean total number of steps taken per day?
+### 2 What is mean total number of steps taken per day?
 
 For this part of the assignment, you can ignore the missing values in
 the dataset.
@@ -93,14 +93,14 @@ the dataset.
 2. Calculate and report the **mean** and **median** total number of steps taken per day
 
 
-### What is the average daily activity pattern?
+### 3 What is the average daily activity pattern?
 
 1. Make a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
-### Imputing missing values
+### 4 Imputing missing values
 
 Note that there are a number of days/intervals where there are missing
 values (coded as `NA`). The presence of missing days may introduce
@@ -115,7 +115,7 @@ bias into some calculations or summaries of the data.
 4. Make a histogram of the total number of steps taken each day and Calculate and report the **mean** and **median** total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 
-### Are there differences in activity patterns between weekdays and weekends?
+### 5 Are there differences in activity patterns between weekdays and weekends?
 
 For this part the `weekdays()` function may be of some help here. Use
 the dataset with the filled-in missing values for this part.

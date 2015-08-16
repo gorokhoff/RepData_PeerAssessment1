@@ -7,8 +7,8 @@
 
 ```r
 unzip("activity.zip")
-ds<-read.csv("activity.csv")
-summary(ds)
+activityDs<-read.csv("activity.csv")
+summary(activityDs)
 ```
 
 ```
@@ -25,7 +25,7 @@ summary(ds)
 Explore for NA values and remove them
 
 ```r
-tds<-na.omit(ds)
+tds<-na.omit(activityDs)
 ```
 
 ## What is mean total number of steps taken per day?
@@ -33,10 +33,11 @@ tds<-na.omit(ds)
 
 Summarizing total number of steps per day and make histogram
 
+
 ```r
 library(sqldf)
-t1<-sqldf("select sum(steps) as step_sum, date from tds group by date")
-hist(t1$step_sum, col = "red", xlab = "Total steps per day", main = "Steps per day")
+sumSteps<-sqldf("select sum(steps) as step_sum, date from tds group by date")
+hist(sumSteps$step_sum, col = "red", xlab = "Total steps per day", main = "Steps per day")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
@@ -50,9 +51,9 @@ Average daily activity are on the next plot
 
 
 ```r
-t2<-sqldf("select avg(steps) as step_avg, interval from tds group by interval")
-mint<-t2[t2$step_avg == max(t2$step_avg),]$interval
-plot(t2$interval, t2$step_avg,  type = 'l', xlab = '5-minute interval', ylab = 'Average steps',
+avgSteps<-sqldf("select avg(steps) as step_avg, interval from tds group by interval")
+mint<-avgSteps[avgSteps$step_avg == max(avgSteps$step_avg),]$interval
+plot(avgSteps$interval, avgSteps$step_avg,  type = 'l', xlab = '5-minute interval', ylab = 'Average steps',
      main = 'Average number of steps taken, averaged across all days')
 ```
 
@@ -64,7 +65,7 @@ And the maximum average value of steps are in 835 interval
 There are some missing values in data. At first we just calculate them:
 
 ```r
-colSums(is.na(ds))
+colSums(is.na(activityDs))
 ```
 
 ```
@@ -72,7 +73,32 @@ colSums(is.na(ds))
 ##     2304        0        0
 ```
 
-And second, fill in with some values
+And second, calculate missing value. We can take rounded average value for interval to fill in missing value and create another data set equal to the original dataset but with the missing data filled in. 
+
+```r
+data<-activityDs
+for(i in 1:nrow(data)){
+  if (is.na(data[i,"steps"])){
+    dinterval<-data[i,"interval"]
+    mv<-avgSteps[avgSteps$interval==dinterval,1]
+    data[i,"steps"]<-round(mv)
+  }
+}
+```
+
+Create summary histogram
+
+
+```r
+sumStepsCalc<-sqldf("select sum(steps) as step_sum, date from data group by date")
+hist(sumStepsCalc$step_sum, col = "red", xlab = "Total steps per day", main = "Steps per day (missing calculated)")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
+
+
+
+The mean with calculated missing value value is 1.0765639\times 10^{4} and median is 1.0762\times 10^{4}
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -85,4 +111,13 @@ tds$date<-as.Date(tds$date)
 tds$wd<-format(tds$date,'%w')
 tds$weekday <- ifelse((tds$wd  == 6 | tds$wd  == 0), 'weekend', 'weekday' )
 tds$weekday <- as.factor(tds$weekday)
+weekend_ds<-subset(tds, weekday == 'weekend')
+weekday_ds<-subset(tds, weekday == 'weekday')
+aweekend_ds<-sqldf("select avg(steps) as step_avg, interval from weekend_ds group by interval")
+aweekday_ds<-sqldf("select avg(steps) as step_avg, interval from weekday_ds group by interval")
+par(mfrow = c(2,1))
+plot(aweekend_ds$interval, aweekend_ds$step_avg,  type = 'l',xlab = 'Interval', ylab = 'Average steps', main='weekend activity pattern')
+plot(aweekday_ds$interval, aweekday_ds$step_avg,  type = 'l', xlab = 'Interval', ylab = 'Average steps', main='weekday activity pattern')
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
